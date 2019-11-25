@@ -4,27 +4,27 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: "Cognito User Pool"
 
 Resources:
-  UserPool:
+  CognitoUserPool:
     Type: AWS::Cognito::UserPool
     Properties:
       UserPoolName: demo-101
       UsernameAttributes:
         - email
 
-  UserPoolApp:
+  CognitoUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:
       ClientName: demo-101-app
       GenerateSecret: false
-      UserPoolId: !Ref UserPool
+      UserPoolId: !Ref CognitoUserPool
 
-  IdentityPool:
+  CognitoIdentityPool:
     Type: AWS::Cognito::IdentityPool
     Properties:
       IdentityPoolName: demo101AppReact
       AllowUnauthenticatedIdentities: false
 
-  IamRoleAuth:
+  AuthenticatedRole:
     Type: AWS::IAM::Role
     Properties:
       RoleName: Cognito_demo101Auth_Role
@@ -40,11 +40,11 @@ Resources:
               - sts:AssumeRoleWithWebIdentity
             Condition:
               StringEquals:
-                cognito-identity.amazonaws.com:aud: !Ref IdentityPool
+                cognito-identity.amazonaws.com:aud: !Ref CognitoIdentityPool
               ForAnyValue:StringLike:
                 cognito-identity.amazonaws.com:amr: authenticated
 
-  IamRoleUnAuth:
+  UnAuthenticatedRole:
     Type: AWS::IAM::Role
     Properties:
       RoleName: Cognito_demo101UnAuth_Role
@@ -60,11 +60,11 @@ Resources:
               - sts:AssumeRoleWithWebIdentity
             Condition:
               StringEquals:
-                cognito-identity.amazonaws.com:aud: !Ref IdentityPool
+                cognito-identity.amazonaws.com:aud: !Ref CognitoIdentityPool
               ForAnyValue:StringLike:
                 cognito-identity.amazonaws.com:amr: unauthenticated
 
-  IamPolicyAuth:
+  CognitoAuthRole:
     Type: "AWS::IAM::Policy"
     Properties:
       PolicyName: oneClick_Cognito_demo101Auth_Role
@@ -78,9 +78,9 @@ Resources:
               - cognito-sync:*
             Resource: "*"
       Roles:
-        - !Ref IamRoleAuth
+        - !Ref AuthenticatedRole
 
-  IamPolicyUnAuth:
+  CognitoUnAuthRole:
     Type: "AWS::IAM::Policy"
     Properties:
       PolicyName: oneClick_Cognito_demo101UnAuth_Role
@@ -93,36 +93,34 @@ Resources:
               - cognito-sync:*
             Resource: "*"
       Roles:
-        - !Ref IamRoleUnAuth
+        - !Ref UnAuthenticatedRole
 
-  IdentityPoolRoleAttachmentAuth:
+  CognitoIdentityPoolSetRoles:
     Type: AWS::Cognito::IdentityPoolRoleAttachment
     Properties:
-      IdentityPoolId: !Ref IdentityPool
+      IdentityPoolId: !Ref CognitoIdentityPool
       Roles:
-        "authenticated": !GetAtt IamRoleAuth.Arn
-        "unauthenticated": !GetAtt IamRoleUnAuth.Arn
-        # "authenticated": !GetAtt AuthenticatedRole.Arn
-        # "unauthenticated": !GetAtt UnAuthenticatedRole.Arn
+        "authenticated": !GetAtt AuthenticatedRole.Arn
+        "unauthenticated": !GetAtt UnAuthenticatedRole.Arn
 
 Outputs:
-  UserPoolId:
+  CognitoUserPoolId:
     Description: "UserPoolId of User Pool"
     Value:
-      Ref: "UserPool"
+      Ref: "CognitoUserPool"
     Export:
       Name: !Sub "${AWS::Region}-${AWS::StackName}-UserPool"
 
-  UserPoolAppId:
+  CognitoUserPoolClientId:
     Description: "UserPoolAppId of User Pool"
     Value:
-      Ref: "UserPoolApp"
+      Ref: CognitoUserPoolClient
     Export:
       Name: !Sub "${AWS::Region}-${AWS::StackName}-UserPoolApp"
 
-  IdentityPoolId:
+  CognitoIdentityPoolId:
     Description: "IdentityPoolId of Identity Pool"
     Value:
-      Ref: IdentityPool
+      Ref: CognitoIdentityPool
     Export:
-      Name: !Sub "${AWS::Region}-${AWS::StackName}-IdentityPoolId"
+      Name: !Sub "${AWS::Region}-${AWS::StackName}-CognitoIdentityPoolId"

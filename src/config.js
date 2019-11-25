@@ -8,9 +8,9 @@ export default {
     URL: "YOUR_API_GATEWAY_URL"
   },
   cognito: {
-    REGION: "ap-southeast-1",
-    USER_POOL_ID: "ap-southeast-1_Qg1WZuzwQ",
-    APP_CLIENT_ID: "1m6l9gr9p39im50cf5j468kp5d",
-    IDENTITY_POOL_ID: "ap-southeast-1:51ff1237-5be4-4560-a3f9-f93f9bee8b56"
+    REGION: process.env.REACT_APP_AWS_RJS_COGNITO_REGION,
+    USER_POOL_ID: process.env.REACT_APP_AWS_RJS_COGNITO_USER_POOL_ID,
+    APP_CLIENT_ID: process.env.REACT_APP_AWS_RJS_COGNITO_APP_CLIENT_ID,
+    IDENTITY_POOL_ID: process.env.REACT_APP_AWS_RJS_COGNITO_IDENTITY_POOL_ID
   }
 };
