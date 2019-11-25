@@ -59,9 +59,9 @@ UnAuth Role w/ Trust Policy first
 aws iam create-role --role-name Cognito_demoAppUnAuth_Role --assume-role-policy-document file://trust-relationship-unauth.json --description "Cognito service unauth role"
 aws iam put-role-policy --role-name Cognito_demoAppUnAuth_Role --policy-name oneClick_Cognito_demoAppUnAuth_Role --policy-document file://cognito-idp-role-unauth.json
 
-aws cognito-identity set-identity-pool-roles \ master ✱
+aws cognito-identity set-identity-pool-roles \
 --identity-pool-id "ap-southeast-1:99b80965-b159-4474-a976-1f95f1082893" \
- --roles authenticated="arn:aws:iam::111111111111:role/Cognito_reactdemoappIdentityPoolAuth_Role"
+--roles authenticated="arn:aws:iam::111111111111:role/Cognito_reactdemoappIdentityPoolAuth_Role"
 
 ## Delete examples
 

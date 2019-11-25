@@ -1,0 +1,126 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: "Cognito User Pool"
+
+Resources:
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: demo-101
+      UsernameAttributes:
+        - email
+
+  UserPoolApp:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: demo-101-app
+      GenerateSecret: false
+      UserPoolId: !Ref UserPool
+
+  IdentityPool:
+    Type: AWS::Cognito::IdentityPool
+    Properties:
+      IdentityPoolName: demo101AppReact
+      AllowUnauthenticatedIdentities: false
+
+  IamRoleAuth:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: Cognito_demo101Auth_Role
+      Description: Cognito service auth role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated:
+                - cognito-identity.amazonaws.com
+            Action:
+              - "sts:AssumeRoleWithWebIdentity"
+            Condition:
+              StringEquals: { "cognito-identity.amazonaws.com:aud": "ap-southeast-1:e7db409f-c235-45b7-9ad5-f0c0674688b2" }
+              ForAnyValue:StringLike: { "cognito-identity.amazonaws.com:amr": "authenticated" }
+
+  IamRoleUnAuth:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: Cognito_demo101UnAuth_Role
+      Description: Cognito service unauth role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated:
+                - cognito-identity.amazonaws.com
+            Action:
+              - "sts:AssumeRoleWithWebIdentity"
+            Condition:
+              StringEquals: { "cognito-identity.amazonaws.com:aud": "ap-southeast-1:e7db409f-c235-45b7-9ad5-f0c0674688b2" }
+              # StringEquals: !Join ["", ['{ "cognito-identity.amazonaws.com:amr": "', Ref: IdentityPool, '"}']]
+              # StringEquals: { "Fn::Sub": ['{ "cognito-identity.amazonaws.com:aud": "${IdentityPool}" }', { "IdentityPool": { "Ref": "IdentityPool" } }] }
+              ForAnyValue:StringLike: { "cognito-identity.amazonaws.com:amr": "unauthenticated" }
+
+  IamPolicyAuth:
+    Type: "AWS::IAM::Policy"
+    Properties:
+      PolicyName: oneClick_Cognito_demo101Auth_Role
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - cognito-identity:*
+              - mobileanalytics:PutEvents
+              - cognito-sync:*
+            Resource: "*"
+      Roles:
+        - !Ref IamRoleAuth
+
+  IamPolicyUnAuth:
+    Type: "AWS::IAM::Policy"
+    Properties:
+      PolicyName: oneClick_Cognito_demo101UnAuth_Role
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - mobileanalytics:PutEvents
+              - cognito-sync:*
+            Resource: "*"
+      Roles:
+        - !Ref IamRoleUnAuth
+
+  IdentityPoolRoleAttachmentAuth:
+    Type: AWS::Cognito::IdentityPoolRoleAttachment
+    Properties:
+      IdentityPoolId: !Ref IdentityPool
+      Roles:
+        "authenticated": !GetAtt IamRoleAuth.Arn
+        "unauthenticated": !GetAtt IamRoleUnAuth.Arn
+        # "authenticated": !GetAtt AuthenticatedRole.Arn
+        # "unauthenticated": !GetAtt UnAuthenticatedRole.Arn
+
+Outputs:
+  UserPoolId:
+    Description: "UserPoolId of User Pool"
+    Value:
+      Ref: "UserPool"
+    Export:
+      Name: !Sub "${AWS::Region}-${AWS::StackName}-UserPool"
+
+  UserPoolAppId:
+    Description: "UserPoolAppId of User Pool"
+    Value:
+      Ref: "UserPoolApp"
+    Export:
+      Name: !Sub "${AWS::Region}-${AWS::StackName}-UserPoolApp"
+
+  IdentityPoolId:
+    Description: "IdentityPoolId of Identity Pool"
+    Value:
+      Ref: IdentityPool
+    Export:
+      Name: !Sub "${AWS::Region}-${AWS::StackName}-IdentityPoolId"
