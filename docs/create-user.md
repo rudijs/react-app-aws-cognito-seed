@@ -26,7 +26,7 @@ aws cognito-idp list-user-pool-clients --user-pool-id ap-southeast-1_EukDsAAHb
 
 ## create user pool and user pool client, add a user
 
-aws cognito-idp create-user-pool --pool-name demo-app
+aws cognito-idp create-user-pool --pool-name demo-app --username-attributes "email"
 
 aws cognito-idp create-user-pool-client --user-pool-id ap-southeast-1_Qg1WZuzwQ --client-name demo-app-client
 
@@ -41,9 +41,9 @@ aws cognito-idp admin-confirm-sign-up \
  --user-pool-id ap-southeast-1_Qg1WZuzwQ \
  --username admin@example.com
 
-aws cognito-idp create-group --user-pool-id ap-southeast-1_Qg1WZuzwQ --group-name adminz
+aws cognito-idp create-group --user-pool-id ap-southeast-1_Qg1WZuzwQ --group-name admin
 
-aws cognito-idp admin-add-user-to-group --user-pool-id ap-southeast-1_Qg1WZuzwQ --group-name adminz --username admin@example.com
+aws cognito-idp admin-add-user-to-group --user-pool-id ap-southeast-1_Qg1WZuzwQ --group-name admin --username admin@example.com
 
 ## create an identity pool
 
@@ -62,3 +62,11 @@ aws iam put-role-policy --role-name Cognito_demoAppUnAuth_Role --policy-name one
 aws cognito-identity set-identity-pool-roles \ master ✱
 --identity-pool-id "ap-southeast-1:99b80965-b159-4474-a976-1f95f1082893" \
  --roles authenticated="arn:aws:iam::111111111111:role/Cognito_reactdemoappIdentityPoolAuth_Role"
+
+## Delete examples
+
+aws cognito-identity list-identity-pools --max-results 10
+aws cognito-identity delete-identity-pool --identity-pool-id ap-southeast-1:ae9cf8a5-82ac-4a5c-90c8-5025a1b21b1f
+
+aws cognito-idp list-user-pools --max-items 10
+aws cognito-idp delete-user-pool --user-pool-id ap-southeast-1_Qg1WZuzwQ
