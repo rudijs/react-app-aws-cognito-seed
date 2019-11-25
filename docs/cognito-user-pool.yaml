@@ -37,10 +37,12 @@ Resources:
               Federated:
                 - cognito-identity.amazonaws.com
             Action:
-              - "sts:AssumeRoleWithWebIdentity"
+              - sts:AssumeRoleWithWebIdentity
             Condition:
-              StringEquals: { "cognito-identity.amazonaws.com:aud": "ap-southeast-1:e7db409f-c235-45b7-9ad5-f0c0674688b2" }
-              ForAnyValue:StringLike: { "cognito-identity.amazonaws.com:amr": "authenticated" }
+              StringEquals:
+                cognito-identity.amazonaws.com:aud: !Ref IdentityPool
+              ForAnyValue:StringLike:
+                cognito-identity.amazonaws.com:amr: authenticated
 
   IamRoleUnAuth:
     Type: AWS::IAM::Role
@@ -55,12 +57,12 @@ Resources:
               Federated:
                 - cognito-identity.amazonaws.com
             Action:
-              - "sts:AssumeRoleWithWebIdentity"
+              - sts:AssumeRoleWithWebIdentity
             Condition:
-              StringEquals: { "cognito-identity.amazonaws.com:aud": "ap-southeast-1:e7db409f-c235-45b7-9ad5-f0c0674688b2" }
-              # StringEquals: !Join ["", ['{ "cognito-identity.amazonaws.com:amr": "', Ref: IdentityPool, '"}']]
-              # StringEquals: { "Fn::Sub": ['{ "cognito-identity.amazonaws.com:aud": "${IdentityPool}" }', { "IdentityPool": { "Ref": "IdentityPool" } }] }
-              ForAnyValue:StringLike: { "cognito-identity.amazonaws.com:amr": "unauthenticated" }
+              StringEquals:
+                cognito-identity.amazonaws.com:aud: !Ref IdentityPool
+              ForAnyValue:StringLike:
+                cognito-identity.amazonaws.com:amr: unauthenticated
 
   IamPolicyAuth:
     Type: "AWS::IAM::Policy"

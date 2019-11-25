@@ -70,3 +70,8 @@ aws cognito-identity delete-identity-pool --identity-pool-id ap-southeast-1:ae9c
 
 aws cognito-idp list-user-pools --max-items 10
 aws cognito-idp delete-user-pool --user-pool-id ap-southeast-1_Qg1WZuzwQ
+
+## Cloudformation
+
+aws cloudformation create-stack --stack-name cognito --template-body file://cognito-user-pool.yaml --capabilities CAPABILITY_NAMED_IAM
+aws cloudformation delete-stack --stack-name cognito
