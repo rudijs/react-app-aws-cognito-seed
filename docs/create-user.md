@@ -89,6 +89,16 @@ aws cognito-idp admin-confirm-sign-up \
  --user-pool-id $AWS_RJS_COGNITO_USER_POOL_ID \
  --username admin@example.com
 
-- `aws cognito-idp create-group --user-pool-id $AWS_RJS_COGNITO_USER_POOL_ID --group-name admin`
+- `aws cloudformation create-stack --stack-name cognito-notes-app-dev --template-body file://cognito.yaml --capabilities CAPABILITY_NAMED_IAM`0
+- `aws cloudformation delete-stack --stack-name cognito-notes-app-dev`
 
-- `aws cognito-idp admin-add-user-to-group --user-pool-id $AWS_RJS_COGNITO_USER_POOL_ID --group-name admin --username admin@example.com`
+```
+aws cloudformation create-stack \
+--stack-name cognito-notes-app-prod \
+--template-body file://cognito.yaml \
+--capabilities CAPABILITY_NAMED_IAM \
+--parameters \
+ParameterKey=Environment,ParameterValue=production
+```
+
+- `aws cloudformation delete-stack --stack-name cognito-notes-app-prod`

@@ -16,6 +16,11 @@ Parameters:
     Type: String
     Default: notes-user-pool
 
+  CognitoUserPoolDomainName:
+    Description: The domain to use for the Cognito User Pool being created.
+    Type: String
+    Default: notes-app
+
   CognitoUserPoolClientName:
     Description: The name of the Cognito User Pool Client being created.
     Type: String
@@ -31,6 +36,9 @@ Parameters:
     Type: String
     Default: Notes_App
 
+Conditions:
+  IsProduction: !Equals [!Ref Environment, "production"]
+
 Resources:
   CognitoUserPool:
     Type: AWS::Cognito::UserPool
@@ -41,6 +49,16 @@ Resources:
           - !Ref Environment
       UsernameAttributes:
         - email
+
+  CognitoUserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      UserPoolId: !Ref CognitoUserPool
+      Domain: !Join
+        - ""
+        - - !Ref CognitoUserPoolDomainName
+          - !If [IsProduction, "", "-"]
+          - !If [IsProduction, "", !Ref Environment]
 
   CognitoUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
@@ -64,12 +82,12 @@ Resources:
   AuthenticatedRole:
     Type: AWS::IAM::Role
     Properties:
-      # RoleName: Cognito_demo101Auth_Role
       RoleName: !Join
         - "_"
         - - Cognito
           - !Ref AuthRoleName
           - Auth_Role
+          - !Ref Environment
       Description: Cognito service auth role
       AssumeRolePolicyDocument:
         Version: 2012-10-17
@@ -94,6 +112,7 @@ Resources:
         - - Cognito
           - !Ref AuthRoleName
           - UnAuth_Role
+          - !Ref Environment
       Description: Cognito service unauth role
       AssumeRolePolicyDocument:
         Version: 2012-10-17
@@ -118,6 +137,7 @@ Resources:
         - - Cognito
           - !Ref AuthRoleName
           - Auth_Role
+          - !Ref Environment
       PolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -138,6 +158,7 @@ Resources:
         - - Cognito
           - !Ref AuthRoleName
           - UnAuth_Role
+          - !Ref Environment
       PolicyDocument:
         Version: 2012-10-17
         Statement:
