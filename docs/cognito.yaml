@@ -199,3 +199,10 @@ Outputs:
       Ref: CognitoIdentityPool
     Export:
       Name: !Sub "${AWS::Region}-${AWS::StackName}-CognitoIdentityPoolId"
+
+  CognitoUserPoolDomain:
+    Description: "Domain name of Cognito User Pool"
+    Value:
+      Ref: CognitoUserPoolDomain
+    Export:
+      Name: !Sub "${AWS::Region}-${AWS::StackName}-CognitoUserPoolDomain"
