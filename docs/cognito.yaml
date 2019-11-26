@@ -1,7 +1,27 @@
 ---
 AWSTemplateFormatVersion: "2010-09-09"
 
-Description: "Serverless Stack Cognito User Pool and Identity Pool"
+Description: >
+  Serverless Stack Cognito User Pool and Identity Pool.
+
+  Usage examples
+
+  * Create dev environment
+  aws cloudformation create-stack --stack-name cognito-notes-app-dev --template-body file://cognito.yaml --capabilities CAPABILITY_NAMED_IAM
+
+  * Delete dev environment
+  aws cloudformation delete-stack --stack-name cognito-notes-app-dev
+
+  * Create prod environment
+  aws cloudformation create-stack \
+  --stack-name cognito-notes-app-prod \
+  --template-body file://cognito.yaml \
+  --capabilities CAPABILITY_NAMED_IAM \
+  --parameters \
+  ParameterKey=Environment,ParameterValue=production
+
+  * Delete prod environment
+  aws cloudformation delete-stack --stack-name cognito-notes-app-prod
 
 Parameters:
   Environment:
