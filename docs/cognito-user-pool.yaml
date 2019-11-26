@@ -1,33 +1,75 @@
 ---
 AWSTemplateFormatVersion: "2010-09-09"
 
-Description: "Cognito User Pool"
+Description: "Serverless Stack Cognito User Pool and Identity Pool"
+
+Parameters:
+  Environment:
+    Description: The environment to use.
+    Type: String
+    Default: dev
+    AllowedValues: ["dev", "staging", "production"]
+    ConstraintDescription: must be dev, staging or production.
+
+  CognitoUserPoolName:
+    Description: The name of the Cognito User Pool being created.
+    Type: String
+    Default: notes-user-pool
+
+  CognitoUserPoolClientName:
+    Description: The name of the Cognito User Pool Client being created.
+    Type: String
+    Default: notes-app
+
+  CognitoIdentityPoolName:
+    Description: The name of the Cognito Identity Pool being created.
+    Type: String
+    Default: notes-identity-pool
+
+  AuthRoleName:
+    Description: The name used in the IAM Auth and Unauth Roles being created.
+    Type: String
+    Default: Notes_App
 
 Resources:
   CognitoUserPool:
     Type: AWS::Cognito::UserPool
     Properties:
-      UserPoolName: demo-101
+      UserPoolName: !Join
+        - "-"
+        - - !Ref CognitoUserPoolName
+          - !Ref Environment
       UsernameAttributes:
         - email
 
   CognitoUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:
-      ClientName: demo-101-app
+      ClientName: !Join
+        - "-"
+        - - !Ref CognitoUserPoolClientName
+          - !Ref Environment
       GenerateSecret: false
       UserPoolId: !Ref CognitoUserPool
 
   CognitoIdentityPool:
     Type: AWS::Cognito::IdentityPool
     Properties:
-      IdentityPoolName: demo101AppReact
+      IdentityPoolName: !Join
+        - "-"
+        - - !Ref CognitoIdentityPoolName
+          - !Ref Environment
       AllowUnauthenticatedIdentities: false
 
   AuthenticatedRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: Cognito_demo101Auth_Role
+      # RoleName: Cognito_demo101Auth_Role
+      RoleName: !Join
+        - "_"
+        - - Cognito
+          - !Ref AuthRoleName
+          - Auth_Role
       Description: Cognito service auth role
       AssumeRolePolicyDocument:
         Version: 2012-10-17
@@ -47,7 +89,11 @@ Resources:
   UnAuthenticatedRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: Cognito_demo101UnAuth_Role
+      RoleName: !Join
+        - "_"
+        - - Cognito
+          - !Ref AuthRoleName
+          - UnAuth_Role
       Description: Cognito service unauth role
       AssumeRolePolicyDocument:
         Version: 2012-10-17
@@ -67,7 +113,11 @@ Resources:
   CognitoAuthRole:
     Type: "AWS::IAM::Policy"
     Properties:
-      PolicyName: oneClick_Cognito_demo101Auth_Role
+      PolicyName: !Join
+        - "_"
+        - - Cognito
+          - !Ref AuthRoleName
+          - Auth_Role
       PolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -83,7 +133,11 @@ Resources:
   CognitoUnAuthRole:
     Type: "AWS::IAM::Policy"
     Properties:
-      PolicyName: oneClick_Cognito_demo101UnAuth_Role
+      PolicyName: !Join
+        - "_"
+        - - Cognito
+          - !Ref AuthRoleName
+          - UnAuth_Role
       PolicyDocument:
         Version: 2012-10-17
         Statement:
